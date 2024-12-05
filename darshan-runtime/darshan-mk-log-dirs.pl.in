@@ -9,9 +9,17 @@ use File::Basename;
 # creates a hierarchy of subdirectories for darshan to place log files in
 # LOGDIR/<year>/<month>/<day>/
 
-# use log dir specified at configure time
+# Default: use log dir specified at configure time
 $LOGDIR = "@__DARSHAN_LOG_PATH@";
 
+if (@ARGV > 1) {
+    print "Error: Too many arguments!\n";
+    exit(1);
+}
+if (@ARGV == 1) {
+    $LOGDIR = $ARGV[0];
+}
+print "Formatting LOGDIR '$LOGDIR' ...\n";
 
 my $year = (localtime)[5] + 1900;
 my $month;
@@ -24,8 +32,11 @@ umask(0);
 
 if(not -d "$LOGDIR")
 {
-    print STDERR "Error: please make sure that the $LOGDIR directory already exists.\n";
-    exit(1)
+    print "Creating LOGDIR ...\n";
+    if (not mkdir("$LOGDIR", 0755)) {
+        print STDERR "Error: could not create LOGDIR '$LOGDIR'\n";
+        exit(1);
+    }
 }
 
 if(not -w "$LOGDIR")
